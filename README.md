@@ -28,4 +28,4 @@ Difference: 0%
 
 ### License
 
-`imgdiff` is [MIT licensed](./LICENSE)..
+`imgdiff` is [MIT licensed](./LICENSE)
