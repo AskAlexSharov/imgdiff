@@ -5,7 +5,7 @@ Returns % of difference
 ## Install
 
 ```bash
-go get -u github.com/AskAlexSharov/imgdiff
+go install -u github.com/AskAlexSharov/imgdiff
 ```
 
 ## Use
