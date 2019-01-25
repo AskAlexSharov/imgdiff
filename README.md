@@ -2,13 +2,13 @@
 Results are stable for next transformations: "scale-up/scale-down", color adjustment
 Returns % of difference
 
-## Install
+### Install
 
 ```bash
 go get -u github.com/AskAlexSharov/imgdiff
 ```
 
-## Use
+### Use
 
 ```bash
 imgdiff ./test-png-original.png ./test-png-damaged.png
@@ -20,8 +20,12 @@ Or you can use URL of image
 imgdiff https://urloffile.com/file1.jpg https://urloffile.com/file2.jpg
 Difference: 0% 
 ```
-## Features
+### Features
 
 - JPEG
 - PNG 
 - Local files and download from Url
+
+### License
+
+`imgdiff` is [MIT licensed](./LICENSE)..
