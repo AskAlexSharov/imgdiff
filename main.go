@@ -2,15 +2,17 @@ package main
 
 import (
 	"fmt"
-	"github.com/Nr90/imgsim"
 	"image"
 	"image/jpeg"
 	"image/png"
 	"io"
+	"log"
 	"net/http"
 	"net/url"
 	"os"
 	"path/filepath"
+
+	"github.com/Nr90/imgsim"
 )
 
 func main() {
@@ -19,15 +21,11 @@ func main() {
 		return
 	}
 
-	fileName1 := os.Args[1]
-	fileName2 := os.Args[2]
-
-	fmt.Printf("Diffeernce: %d%%\n", readAndGetDistance(fileName1, fileName2))
+	fmt.Printf("Diffeernce: %d%%\n", readAndGetDistance(os.Args[1], os.Args[2]))
 }
 
 func readAndGetDistance(fileName1, fileName2 string) int {
-	img1, img2 := readAndDecode(fileName1), readAndDecode(fileName2)
-	return distance(img1, img2)
+	return distance(readAndDecode(fileName1), readAndDecode(fileName2))
 }
 
 func parseUrl(rawurl string) (*url.URL, bool) {
@@ -52,12 +50,12 @@ func mustGet(rawurl string) io.ReadCloser {
 
 func readAndDecode(filePathOrUrl string) image.Image {
 	// Read
-	url1, isUrl := parseUrl(filePathOrUrl)
+	parsedUrl, isUrl := parseUrl(filePathOrUrl)
 
 	if isUrl {
 		body := mustGet(filePathOrUrl)
 		defer body.Close()
-		return decode(url1.Path, body)
+		return decode(parsedUrl.Path, body)
 	}
 
 	f, err := os.Open(filePathOrUrl)
@@ -69,26 +67,26 @@ func readAndDecode(filePathOrUrl string) image.Image {
 }
 
 func decode(fileName string, f io.Reader) image.Image {
-	var img image.Image
-	var err error
 	ext := filepath.Ext(fileName)
 
 	if ext == ".jpeg" || ext == ".jpg" {
-		img, err = jpeg.Decode(f)
+		img, err := jpeg.Decode(f)
 		if err != nil {
 			panic(err)
 		}
-
+		return img
 	}
 
 	if ext == ".png" {
-		img, err = png.Decode(f)
+		img, err := png.Decode(f)
 		if err != nil {
 			panic(err)
 		}
+		return img
 	}
 
-	return img
+	log.Fatalf("Not supported file extension: %s", ext)
+	return nil
 }
 
 func distance(img1, img2 image.Image) int {
