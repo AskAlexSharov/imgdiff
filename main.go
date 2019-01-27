@@ -25,7 +25,7 @@ func main() {
 }
 
 func readAndGetDistance(fileName1, fileName2 string) int {
-	return distance(readAndDecode(fileName1), readAndDecode(fileName2))
+	return distance(<-readAndDecode(fileName1), <-readAndDecode(fileName2))
 }
 
 func parseUrl(rawurl string) (*url.URL, bool) {
@@ -48,22 +48,32 @@ func mustGet(rawurl string) io.ReadCloser {
 	return resp.Body
 }
 
-func readAndDecode(filePathOrUrl string) image.Image {
-	// Read
-	parsedUrl, isUrl := parseUrl(filePathOrUrl)
+func readAndDecode(filePathOrUrl string) chan image.Image {
+	res := make(chan image.Image)
+	go func() {
+		defer close(res)
 
-	if isUrl {
-		body := mustGet(filePathOrUrl)
-		defer body.Close()
-		return decode(parsedUrl.Path, body)
-	}
+		// Read
+		parsedUrl, isUrl := parseUrl(filePathOrUrl)
 
-	f, err := os.Open(filePathOrUrl)
-	if err != nil {
-		panic(err)
-	}
-	defer f.Close()
-	return decode(filePathOrUrl, f)
+		if isUrl {
+			body := mustGet(filePathOrUrl)
+			defer body.Close()
+			res <- decode(parsedUrl.Path, body)
+			return
+
+		}
+
+		f, err := os.Open(filePathOrUrl)
+		if err != nil {
+			panic(err)
+		}
+		defer f.Close()
+		res <- decode(filePathOrUrl, f)
+		return
+	}()
+
+	return res
 }
 
 func decode(fileName string, f io.Reader) image.Image {
