@@ -11,6 +11,7 @@ import (
 	"net/url"
 	"os"
 	"path/filepath"
+	"sync"
 )
 
 type Result struct {
@@ -18,24 +19,30 @@ type Result struct {
 	Err error
 }
 
-func ImageAsync(ctx context.Context, filePathOrUrl string) chan Result {
-	res := make(chan Result)
-	go func() {
-		defer close(res)
+func ImagesAsync(ctx context.Context, filePathOrUrls ...string) chan Result {
+	resultCh := make(chan Result)
+	wg := sync.WaitGroup{}
+	wg.Add(len(filePathOrUrls))
+	for _, filePathOrUrl := range filePathOrUrls {
+		go func(filePathOrUrl string) {
+			defer wg.Done()
+			select {
+			case resultCh <- Image(ctx, filePathOrUrl):
+			case <-ctx.Done():
+				resultCh <- Result{Err: ctx.Err()}
+			}
+		}(filePathOrUrl)
+	}
 
-		select {
-		case res <- img(ctx, filePathOrUrl):
-			return
-		case <-ctx.Done():
-			res <- Result{Err: ctx.Err()}
-			return
-		}
+	go func() {
+		wg.Wait()
+		close(resultCh)
 	}()
 
-	return res
+	return resultCh
 }
 
-func img(ctx context.Context, filePathOrUrl string) Result {
+func Image(ctx context.Context, filePathOrUrl string) Result {
 	// Read
 	var imgReader io.Reader
 	var fileName string
