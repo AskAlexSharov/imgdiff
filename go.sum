@@ -1,4 +1,6 @@
 github.com/Nr90/imgsim v0.0.0-20180202144352-5caa057144b0 h1:8cjsGKoi/1QBb0V2ps3iBra9c4o+qY/NaJ15NsdjmQ4=
 github.com/Nr90/imgsim v0.0.0-20180202144352-5caa057144b0/go.mod h1:PSWPVD+KeWK3XVt0i/AahAMRw38OZ1k1vJpJLuvIY1w=
+github.com/aws/aws-lambda-go v1.8.1 h1:nHBpP6XC30bwF6qWKrw/BrK2A8i4GKmSZzajTBIJS4A=
+github.com/aws/aws-lambda-go v1.8.1/go.mod h1:zUsUQhAUjYzR8AuduJPCfhBuKWUaDbQiPOG+ouzmE1A=
 github.com/nfnt/resize v0.0.0-20180221191011-83c6a9932646 h1:zYyBkD/k9seD2A7fsi6Oo2LfFZAehjjQMERAvZLEDnQ=
 github.com/nfnt/resize v0.0.0-20180221191011-83c6a9932646/go.mod h1:jpp1/29i3P1S/RLdc7JQKbRpFeM1dOBd8T9ki5s+AY8=

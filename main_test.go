@@ -1,6 +1,9 @@
 package main
 
-import "testing"
+import (
+	"context"
+	"testing"
+)
 
 func Test_distance(t *testing.T) {
 	tests := []struct {
@@ -16,21 +19,25 @@ func Test_distance(t *testing.T) {
 			wantDistance: 0,
 		},
 		{
-			name:         "Original vs Damaged - 3%",
+			name:         "Original vs Damaged - 1%",
 			file1:        "./test-png-original.png",
 			file2:        "https://raw.githubusercontent.com/AskAlexSharov/imgdiff/master/test-png-damaged.png",
-			wantDistance: 3,
+			wantDistance: 1,
 		},
 		{
-			name:         "Scaled Down vs Damaged - 3%",
+			name:         "Scaled Down vs Damaged - 1%",
 			file1:        "https://raw.githubusercontent.com/AskAlexSharov/imgdiff/master/test-png-scaled-down.png",
 			file2:        "./test-png-damaged.png",
-			wantDistance: 3,
+			wantDistance: 1,
 		},
 	}
 	for _, tt := range tests {
 		t.Run(tt.name, func(t *testing.T) {
-			gotDistance := readAndGetDistance(tt.file1, tt.file2)
+			gotDistance, err := readAndGetDistance(context.Background(), tt.file1, tt.file2)
+			if err != nil {
+				t.Errorf("unexpected error: %v", err)
+				return
+			}
 			if gotDistance != tt.wantDistance {
 				t.Errorf("distance() gotDistance = %v, want %v", gotDistance, tt.wantDistance)
 			}
