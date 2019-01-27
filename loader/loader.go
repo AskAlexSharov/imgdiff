@@ -44,27 +44,26 @@ func ImagesAsync(ctx context.Context, filePathOrUrls ...string) chan Result {
 
 func Image(ctx context.Context, filePathOrUrl string) Result {
 	// Read
-	var imgReader io.Reader
+	var img io.Reader
 	var fileName string
 
-	parsedUrl, isUrl := parseUrl(filePathOrUrl)
-	if isUrl {
+	if parsedUrl, ok := parseUrl(filePathOrUrl); ok {
 		resp, err := getByUrl(ctx, filePathOrUrl)
 		if err != nil {
 			return Result{Err: err}
 		}
 		defer resp.Body.Close()
-		imgReader = resp.Body
+		img = resp.Body
 		fileName = parsedUrl.Path
-	} else {
+	} else { // then it's file
 		var err error
-		if imgReader, err = os.Open(filePathOrUrl); err != nil {
+		if img, err = os.Open(filePathOrUrl); err != nil {
 			return Result{Err: err}
 		}
 		fileName = filePathOrUrl
 	}
 
-	return decode(fileName, imgReader)
+	return decode(fileName, img)
 }
 
 func parseUrl(rawurl string) (*url.URL, bool) {
