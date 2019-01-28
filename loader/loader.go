@@ -48,15 +48,12 @@ func Image(ctx context.Context, filePathOrUrl string) Result {
 	var fileName string
 
 	if parsedUrl, ok := parseUrl(filePathOrUrl); ok {
-		resp, err := getByUrl(ctx, filePathOrUrl)
+		resp, closer, err := getByUrl(ctx, filePathOrUrl)
 		if err != nil {
 			return Result{Err: err}
 		}
-		defer func() {
-			if resp.Body != nil {
-				resp.Body.Close()
-			}
-		}()
+		defer closer()
+
 		img = resp.Body
 		fileName = parsedUrl.Path
 	} else { // then it's file
@@ -96,23 +93,28 @@ func decode(fileName string, f io.Reader) Result {
 	return result
 }
 
-func getByUrl(ctx context.Context, url string) (*http.Response, error) {
+func getByUrl(ctx context.Context, url string) (*http.Response, func(), error) {
 	req, err := http.NewRequest("GET", url, nil)
 	if err != nil {
-		return nil, err
+		return nil, nil, err
 	}
 
 	resp, err := http.DefaultClient.Do(req.WithContext(ctx))
-	if err != nil {
-		return nil, err
-	}
-
-	if resp.StatusCode != http.StatusOK {
-		if resp.Body != nil {
-			resp.Body.Close()
+	closer := func() {
+		if resp == nil || resp.Body == nil {
+			return
 		}
-		return nil, err
+
+		resp.Body.Close()
 	}
 
-	return resp, nil
+	if err != nil {
+		return nil, closer, err
+	}
+	if resp.StatusCode != http.StatusOK {
+		closer()
+		return nil, closer, err
+	}
+
+	return resp, closer, nil
 }
