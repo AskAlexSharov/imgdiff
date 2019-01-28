@@ -2,7 +2,6 @@ package avg
 
 import (
 	"context"
-	"fmt"
 
 	"github.com/AskAlexSharov/imgdiff/loader"
 	"github.com/Nr90/imgsim"
@@ -25,8 +24,6 @@ func Distance(ctx context.Context, fileName1, fileName2 string) (int, error) {
 	}
 	ahash2 := imgsim.AverageHash(r2.Img)
 
-	fmt.Println(ahash1)
-	fmt.Println(ahash2)
 	return imgsim.Distance(ahash1, ahash2) % 64, nil // because 64 bit hash
 }
 

@@ -6,6 +6,7 @@ before:
     - go generate ./...
     - gometalinter.v2 ./... --vendor --deadline=1m --disable-all --enable=gosec
     - golangci-lint run --enable-all
+    - go test -failfast -race ./...
 builds:
 - env:
   - CGO_ENABLED=0
