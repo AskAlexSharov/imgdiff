@@ -110,7 +110,7 @@ func getByURL(ctx context.Context, url string) (*http.Response, func(), error) {
 		}
 
 		if err := resp.Body.Close(); err != nil {
-			log.Panicln(err.Error())
+			log.Printf("WARN: can't close http request body by reason %s", err.Error())
 		}
 	}
 
