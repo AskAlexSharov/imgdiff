@@ -1,0 +1,28 @@
+# Documentation at http://goreleaser.com
+# Before release, create tag by: git tag -a v1.2.0 -m "Release: v1.2.0" && git push origin v1.2.0
+before:
+  hooks:
+    - go mod vendor
+    - go generate ./...
+    - gometalinter.v2 ./... --vendor --deadline=1m --disable-all --enable=gosec
+    - golangci-lint run --enable-all
+builds:
+- env:
+  - CGO_ENABLED=0
+archive:
+  replacements:
+    darwin: Darwin
+    linux: Linux
+    windows: Windows
+    386: i386
+    amd64: x86_64
+checksum:
+  name_template: 'checksums.txt'
+snapshot:
+  name_template: "{{ .Tag }}-next"
+changelog:
+  sort: asc
+  filters:
+    exclude:
+    - '^docs:'
+    - '^test:'
