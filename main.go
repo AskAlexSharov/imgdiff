@@ -3,8 +3,9 @@ package main
 import (
 	"context"
 	"fmt"
-	"github.com/AskAlexSharov/imgdiff/avg"
 	"os"
+
+	"github.com/AskAlexSharov/imgdiff/avg"
 )
 
 func main() {

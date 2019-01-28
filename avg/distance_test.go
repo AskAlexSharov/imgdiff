@@ -31,15 +31,16 @@ func Test_distance(t *testing.T) {
 			wantDistance: 1,
 		},
 	}
-	for _, tt := range tests {
-		t.Run(tt.name, func(t *testing.T) {
-			gotDistance, err := Distance(context.Background(), tt.file1, tt.file2)
+	for _, tc := range tests {
+		tc := tc // capture range variable
+		t.Run(tc.name, func(t *testing.T) {
+			gotDistance, err := Distance(context.Background(), tc.file1, tc.file2)
 			if err != nil {
 				t.Errorf("unexpected error: %v", err)
 				return
 			}
-			if gotDistance != tt.wantDistance {
-				t.Errorf("distance() gotDistance = %v, want %v", gotDistance, tt.wantDistance)
+			if gotDistance != tc.wantDistance {
+				t.Errorf("distance() gotDistance = %v, want %v", gotDistance, tc.wantDistance)
 			}
 		})
 	}

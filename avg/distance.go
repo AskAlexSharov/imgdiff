@@ -3,10 +3,12 @@ package avg
 import (
 	"context"
 	"fmt"
+
 	"github.com/AskAlexSharov/imgdiff/loader"
 	"github.com/Nr90/imgsim"
 )
 
+// Distance calculate average difference between 2 images
 func Distance(ctx context.Context, fileName1, fileName2 string) (int, error) {
 	ch := loader.ImagesAsync(ctx, fileName1, fileName2)
 

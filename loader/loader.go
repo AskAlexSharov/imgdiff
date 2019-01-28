@@ -7,6 +7,7 @@ import (
 	"image/jpeg"
 	"image/png"
 	"io"
+	"log"
 	"net/http"
 	"net/url"
 	"os"
@@ -14,24 +15,26 @@ import (
 	"sync"
 )
 
+// Result image reading/downloading and decoding result
 type Result struct {
 	Img image.Image
 	Err error
 }
 
-func ImagesAsync(ctx context.Context, filePathOrUrls ...string) chan Result {
+// ImagesAsync download/read and decode files in parallel
+func ImagesAsync(ctx context.Context, filePathOrURLs ...string) chan Result {
 	resultCh := make(chan Result)
 	wg := sync.WaitGroup{}
-	wg.Add(len(filePathOrUrls))
-	for _, filePathOrUrl := range filePathOrUrls {
-		go func(filePathOrUrl string) {
+	wg.Add(len(filePathOrURLs))
+	for _, filePathOrURL := range filePathOrURLs {
+		go func(filePathOrURL string) {
 			defer wg.Done()
 			select {
-			case resultCh <- Image(ctx, filePathOrUrl):
+			case resultCh <- Image(ctx, filePathOrURL):
 			case <-ctx.Done():
 				resultCh <- Result{Err: ctx.Err()}
 			}
-		}(filePathOrUrl)
+		}(filePathOrURL)
 	}
 
 	go func() {
@@ -42,37 +45,38 @@ func ImagesAsync(ctx context.Context, filePathOrUrls ...string) chan Result {
 	return resultCh
 }
 
-func Image(ctx context.Context, filePathOrUrl string) Result {
+// Image download/read and decode file
+func Image(ctx context.Context, filePathOrURL string) Result {
 	// Read
 	var img io.Reader
 	var fileName string
 
-	if parsedUrl, ok := parseUrl(filePathOrUrl); ok {
-		resp, closer, err := getByUrl(ctx, filePathOrUrl)
+	if parsedURL, ok := parseURL(filePathOrURL); ok {
+		resp, closer, err := getByURL(ctx, filePathOrURL)
 		if err != nil {
 			return Result{Err: err}
 		}
 		defer closer()
 
 		img = resp.Body
-		fileName = parsedUrl.Path
+		fileName = parsedURL.Path
 	} else { // then it's file
 		var err error
-		if img, err = os.Open(filePathOrUrl); err != nil {
+		if img, err = os.Open(filepath.Clean(filePathOrURL)); err != nil {
 			return Result{Err: err}
 		}
-		fileName = filePathOrUrl
+		fileName = filePathOrURL
 	}
 
 	return decode(fileName, img)
 }
 
-func parseUrl(rawurl string) (*url.URL, bool) {
-	parsedUrl, err := url.ParseRequestURI(rawurl)
+func parseURL(rawurl string) (*url.URL, bool) {
+	parsedURL, err := url.ParseRequestURI(rawurl)
 	if err != nil {
-		return parsedUrl, false
+		return parsedURL, false
 	}
-	return parsedUrl, true
+	return parsedURL, true
 }
 
 func decode(fileName string, f io.Reader) Result {
@@ -93,27 +97,29 @@ func decode(fileName string, f io.Reader) Result {
 	return result
 }
 
-func getByUrl(ctx context.Context, url string) (*http.Response, func(), error) {
-	req, err := http.NewRequest("GET", url, nil)
-	if err != nil {
-		return nil, nil, err
+func getByURL(ctx context.Context, url string) (*http.Response, func(), error) {
+	req, reqErr := http.NewRequest("GET", url, nil)
+	if reqErr != nil {
+		return nil, nil, reqErr
 	}
 
-	resp, err := http.DefaultClient.Do(req.WithContext(ctx))
+	resp, respErr := http.DefaultClient.Do(req.WithContext(ctx))
 	closer := func() {
 		if resp == nil || resp.Body == nil {
 			return
 		}
 
-		resp.Body.Close()
+		if err := resp.Body.Close(); err != nil {
+			log.Panicln(err.Error())
+		}
 	}
 
-	if err != nil {
-		return nil, closer, err
+	if respErr != nil {
+		return nil, closer, respErr
 	}
 	if resp.StatusCode != http.StatusOK {
 		closer()
-		return nil, closer, err
+		return nil, closer, fmt.Errorf("unexpected HTTP response code: %d, of file: %s", resp.StatusCode, url)
 	}
 
 	return resp, closer, nil
