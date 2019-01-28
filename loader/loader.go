@@ -52,7 +52,11 @@ func Image(ctx context.Context, filePathOrUrl string) Result {
 		if err != nil {
 			return Result{Err: err}
 		}
-		defer resp.Body.Close()
+		defer func() {
+			if resp.Body != nil {
+				resp.Body.Close()
+			}
+		}()
 		img = resp.Body
 		fileName = parsedUrl.Path
 	} else { // then it's file
@@ -104,7 +108,9 @@ func getByUrl(ctx context.Context, url string) (*http.Response, error) {
 	}
 
 	if resp.StatusCode != http.StatusOK {
-		resp.Body.Close()
+		if resp.Body != nil {
+			resp.Body.Close()
+		}
 		return nil, err
 	}
 
