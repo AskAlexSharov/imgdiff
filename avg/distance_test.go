@@ -24,6 +24,7 @@ func Test_distance(t *testing.T) {
 			file2:        "https://raw.githubusercontent.com/AskAlexSharov/imgdiff/master/avg/test-png-damaged.png",
 			wantDistance: 2,
 		},
+
 		{
 			name:         "Scaled Down vs Damaged - 2%",
 			file1:        "https://raw.githubusercontent.com/AskAlexSharov/imgdiff/master/avg/test-png-scaled-down.png",
