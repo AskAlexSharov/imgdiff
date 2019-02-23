@@ -19,16 +19,16 @@ func Test_distance(t *testing.T) {
 			wantDistance: 0,
 		},
 		{
-			name:         "Original vs Damaged - 1%",
+			name:         "Original vs Damaged - 2%",
 			file1:        "./test-png-original.png",
 			file2:        "https://raw.githubusercontent.com/AskAlexSharov/imgdiff/master/avg/test-png-damaged.png",
-			wantDistance: 1,
+			wantDistance: 2,
 		},
 		{
-			name:         "Scaled Down vs Damaged - 1%",
+			name:         "Scaled Down vs Damaged - 2%",
 			file1:        "https://raw.githubusercontent.com/AskAlexSharov/imgdiff/master/avg/test-png-scaled-down.png",
 			file2:        "./test-png-damaged.png",
-			wantDistance: 1,
+			wantDistance: 2,
 		},
 	}
 	for _, tc := range tests {
@@ -45,3 +45,9 @@ func Test_distance(t *testing.T) {
 		})
 	}
 }
+
+//func BenchmarkHello(b *testing.B) {
+//	for i := 0; i < b.N; i++ {
+//		Distance(context.Background(), "./test-png-original.png", "./test-png-scaled-down.png")
+//	}
+//}
