@@ -13,14 +13,14 @@ go get -u github.com/AskAlexSharov/imgdiff
 ### Use
 
 ```bash
-imgdiff ./test-png-original.png ./test-png-damaged.png
-Difference: 3%
+imgdiff ./avg/test-png-original.png ./avg/test-png-damaged.png
+Difference: 2%
 ```
 
 Or you can use URL of image
 ```bash
-imgdiff https://urloffile.com/file1.jpg https://urloffile.com/file2.jpg
-Difference: 0% 
+imgdiff https://raw.githubusercontent.com/AskAlexSharov/imgdiff/master/avg/test-png-original.png https://raw.githubusercontent.com/AskAlexSharov/imgdiff/master/avg/test-png-damaged.png
+Difference: 2% 
 ```
 ### Features
 
