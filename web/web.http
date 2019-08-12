@@ -1,0 +1,15 @@
+http://localhost:3333/articles
+Content-Type: application/json
+
+###
+
+http://localhost:3333/articles/1
+Content-Type: application/json
+
+###
+
+DELETE http://localhost:3333/articles/1
+
+###
+
+
