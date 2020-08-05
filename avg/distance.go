@@ -2,11 +2,11 @@ package avg
 
 import (
 	"context"
+	"fmt"
 	"image"
 	"math"
 
 	"github.com/AskAlexSharov/imgdiff/loader"
-	"github.com/Nr90/imgsim"
 )
 
 // Distance calculate average difference between 2 images
@@ -32,9 +32,12 @@ func Distance(ctx context.Context, fileName1, fileName2 string) (int, error) {
 }
 
 func DistancePure(ctx context.Context, img1, img2 image.Image) (int, error) {
-	ahash1 := imgsim.AverageHash(img1)
-	ahash2 := imgsim.AverageHash(img2)
-	percents := float64(imgsim.Distance(ahash1, ahash2)) / 64 * 100 // because 64 bit hash
+	ahash1 := AverageHash(img1)
+	ahash2 := AverageHash(img2)
+	fmt.Printf("ahash1: %v\n",uint64(ahash1))
+	fmt.Printf("ahash2: %v\n",uint64(ahash2))
+
+	percents := float64(Distance2(ahash1, ahash2)) / 64 * 100 // because 64 bit hash
 
 	return int(math.Round(percents)), nil
 }
